@@ -1,0 +1,37 @@
+databases:
+  - name: syrian-board-db
+    databaseName: board
+    ipAllowList: []
+    plan: free
+
+services:
+  - type: web
+    name: syrian-board-direct
+    runtime: node
+    plan: free
+    buildCommand: |
+      ls -la &&
+      ls -la prisma/ 2>/dev/null || echo "no prisma dir" &&
+      ls -la schema.prisma 2>/dev/null || echo "no root schema" &&
+      if [ ! -f prisma/schema.prisma ] && [ -f schema.prisma ]; then
+        mkdir -p prisma && cp schema.prisma prisma/schema.prisma;
+      fi &&
+      npm install --legacy-peer-deps &&
+      npx prisma generate --schema=prisma/schema.prisma &&
+      npm run build
+    startCommand: npx prisma db push --schema=prisma/schema.prisma --accept-data-loss && npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.20.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: syrian-board-db
+          property: connectionString
+      - key: ADMIN_PASSWORD_B64
+        value: "JDJiJDEwJEtBaHpUNEN0N1Z0TkJNOUU5OXZFbE94ODVNck9saFFZL1VpN1h3eG5FYjRQYnV0YkR2bFVT"
+      - key: JWT_SECRET
+        value: "SyrianBoard_Direct_2026_SecretKey_DoNotShare_8f3k2m1x7p5q4w6e8r0t2y4u6i8o0a1b3c5d7e9f"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: NPM_CONFIG_LEGACY_PEER_DEPS
+        value: "true"

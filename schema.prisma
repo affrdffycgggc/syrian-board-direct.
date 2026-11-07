@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id              String   @id @default(cuid())
+  nationalId      String   @unique
+  firstName       String
+  fatherName      String
+  familyName      String
+  motherName      String
+  nationality     String
+  birthPlace      String
+  birthYear       String
+  registry        String
+  whatsapp        String
+  email           String
+  address         String
+
+  univName        String
+  univType        String
+  univCountry     String?
+  gradYear        String
+  gpa             Float
+  boardGpa        Float?
+  currentSpecialty String
+  currentDirectorate String
+  residencyYear   String
+  differential    Float
+  differentialBasis String
+
+  w1Spec          String
+  w1Gov           String
+  w2Spec          String?
+  w2Gov           String?
+
+  docs            Json
+  pledge          Boolean @default(false)
+
+  submittedAt     DateTime @default(now())
+  ipAddress       String?
+  userAgent       String?
+
+  @@index([nationalId])
+  @@index([w1Spec])
+  @@index([w2Spec])
+}
